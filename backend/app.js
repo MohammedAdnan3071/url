@@ -2,8 +2,8 @@ import express from "express";
 import { nanoid } from "nanoid";
 import dotenv from "dotenv";
 dotenv.config("./.env");
-import Database from "./src/config/mongo.config.js"
-
+import connectDB from "./src/config/mongo.config.js"
+import Urlschema from "./src/models/shortUrl.model.js"
 
 
 
@@ -21,13 +21,19 @@ app.get("/", (req, res)=>{
 });
 
 //GET - Redirection 
+
+
 // POST - creating the short urls
-
-
 app.post("/api/create", (req,res)=>{
-    const {url }=req.body;
+    const {url }=req.body; //get the URL sent from the client
+    const shortUrl = nanoid(7); // generates a unique short id 
+    const newUrl = new Urlschema({ // create a new MongoDB schema
+        full_url:url, 
+        short_url:shortUrl
+    });
+    newUrl.save() // save it into the db
     console.log(url);
-    res.send(nanoid(7)); // generating urls 
+    res.send(nanoid(7)); // send a new Random ID back to the client
 });
 
 
@@ -46,6 +52,6 @@ app.post("/api/create", (req,res)=>{
 
 
 app.listen(PORT,()=>{
-    Database()
+    connectDB()
     console.log(`Server running on PORT:${PORT}`)
 })
