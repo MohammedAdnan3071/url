@@ -3,9 +3,8 @@ import { nanoid } from "nanoid";
 import dotenv from "dotenv";
 dotenv.config("./.env");
 import connectDB from "./src/config/mongo.config.js"
-import Urlschema from "./src/models/shortUrl.model.js"
-
-
+import urlSchema from "./src/models/short_url.model.js"
+import short_url from "./src/routes/short_url.route.js"
 
 
 const app = express();
@@ -21,20 +20,28 @@ app.get("/", (req, res)=>{
 });
 
 //GET - Redirection 
+app.get("/:id", async(req, res)=>{
+    const {id} =req.params;
+    const url = await urlSchema.findOne({short_url:id});
+    if(url){
+        res.redirect(url.full_url)
+    }else{
+        res.status(404).send("Not found");
+    }
+})
+
+
+
+
+
+
+
+
+
 
 
 // POST - creating the short urls
-app.post("/api/create", (req,res)=>{
-    const {url }=req.body; //get the URL sent from the client
-    const shortUrl = nanoid(7); // generates a unique short id 
-    const newUrl = new Urlschema({ // create a new MongoDB schema
-        full_url:url, 
-        short_url:shortUrl
-    });
-    newUrl.save() // save it into the db
-    console.log(url);
-    res.send(nanoid(7)); // send a new Random ID back to the client
-});
+app.post("/api/create", short_url);
 
 
 
