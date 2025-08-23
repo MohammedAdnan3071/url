@@ -1,17 +1,21 @@
-import { generateNanoId } from "../utils/helper";
+import { generateNanoId } from "../utils/helper.js";
+import urlSchema from "../models/short_url.model.js"
+import { saveShortUrl } from "../dao/short_url.js";
 
 
 
+export const createShortUrlServiceWithoutUser = async (url) =>{
+const shortUrl = await generateNanoId(7);
+    if(!shortUrl) throw new Error("Short URL not generated")
+    await saveShortUrl(shortUrl,url)
+    return shortUrl
+
+}
 
 
-export const createShortUrlService = (url) =>{
-const shortUrl = generateNanoId(7);
-    const newUrl = new urlSchema({ // create a new MongoDB schema
-        full_url:url, 
-        short_url:shortUrl
-    });
-     newUrl.save() // save it into the db
-    console.log(url);
-    res.send(nanoid(7)); // send a new Random ID back to the client
+export const createShortUrlServiceWithUser = async (url,userId) =>{
+const shortUrl = await generateNanoId(7);
+    await saveShortUrl( url, shortUrl,userId)
+    return shortUrl
 
 }

@@ -5,7 +5,8 @@ dotenv.config("./.env");
 import connectDB from "./src/config/mongo.config.js"
 import urlSchema from "./src/models/short_url.model.js"
 import short_url from "./src/routes/short_url.route.js"
-
+import { redirectFromShortUrl } from "./src/controller/short_url.controller.js";
+import { errorHandler } from "./src/utils/errorHandler.js";
 
 const app = express();
 
@@ -18,32 +19,14 @@ const PORT = 3000;
 app.get("/", (req, res)=>{
     res.send("Hello world from get request")
 });
-
-//GET - Redirection 
-app.get("/:id", async(req, res)=>{
-    const {id} =req.params;
-    const url = await urlSchema.findOne({short_url:id});
-    if(url){
-        res.redirect(url.full_url)
-    }else{
-        res.status(404).send("Not found");
-    }
-})
-
-
-
-
-
-
-
-
-
-
+ 
+// GET - Redirection 
+app.get("/:id", redirectFromShortUrl)
 
 // POST - creating the short urls
-app.post("/api/create", short_url);
+app.use("/api/create", short_url);
 
-
+app.use(errorHandler)
 
 
 
